@@ -1,27 +1,67 @@
 import { writeFile } from 'fs/promises';
 import toKML from '@maphubs/tokml';
+import xmlFormatter from 'xml-formatter';
 
-export default async (geoJSON) => {
+export default async (
+    geoJSON,
+    { entriesPerFile, outputName, generateKML, prettyOutput, excludeGeoJSON }
+) => {
     const writePromises = [];
+    const totalPages = Math.ceil(geoJSON.features.length / entriesPerFile);
+    const totalDigits = `${totalPages}`.length;
 
-    if (geoJSON.features.length > 2000) {
-        const geoJSON2 = {
+    const generateFileName = (pageNumber, ext) => {
+        if (totalPages > 1) {
+            return `${outputName}-${`${pageNumber}`.padStart(
+                totalDigits,
+                '0'
+            )}.${ext}`;
+        }
+        return `${outputName}.${ext}`;
+    };
+
+    const formatXMLIfNeeded = (xml) => (prettyOutput ? xmlFormatter(xml) : xml);
+
+    let currentFeatures = geoJSON.features;
+    let currentPage = 1;
+    do {
+        const geoJSONToWrite = {
             ...geoJSON,
-            features: geoJSON.features.slice(2001),
+            features: currentFeatures.slice(0, entriesPerFile),
         };
 
-        geoJSON.features = geoJSON.features.slice(0, 2000);
+        currentFeatures = currentFeatures.slice(entriesPerFile + 1);
 
-        writePromises.push(writeFile('./result2.kml', toKML(geoJSON2)));
-        writePromises.push(
-            await writeFile('./result2.json', JSON.stringify(geoJSON2, null, 2))
-        );
+        if (!excludeGeoJSON) {
+            writePromises.push(
+                writeFile(
+                    generateFileName(currentPage, 'json'),
+                    JSON.stringify(
+                        geoJSONToWrite,
+                        null,
+                        prettyOutput ? 2 : undefined
+                    )
+                )
+            );
+        }
+
+        if (generateKML) {
+            writePromises.push(
+                writeFile(
+                    generateFileName(currentPage, 'kml'),
+                    formatXMLIfNeeded(toKML(geoJSONToWrite))
+                )
+            );
+        }
+
+        ++currentPage;
+    } while (entriesPerFile !== undefined && currentFeatures.length);
+
+    try {
+        await Promise.all(writePromises);
+    } catch (ex) {
+        // eslint-ignore-next-line no-console
+        console.error(`Failed to write output files: ${ex.message}`);
+        process.exit(1);
     }
-
-    writePromises.push(writeFile('./result.kml', toKML(geoJSON)));
-    writePromises.push(
-        writeFile('./result.json', JSON.stringify(geoJSON, null, 2))
-    );
-
-    await Promise.all(writePromises);
 };
