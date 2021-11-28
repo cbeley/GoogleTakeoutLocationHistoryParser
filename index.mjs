@@ -44,7 +44,7 @@ program
         "foo-999.json"
         "foo-999.json"
 `,
-        'resultDefault'
+        'out'
     )
     .argument('<googleTakeoutLocationJSONFiles...>')
     .action(async (googleTakeoutLocationJSONFiles, options) => {
