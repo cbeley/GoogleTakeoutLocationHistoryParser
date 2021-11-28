@@ -1,0 +1,12 @@
+{
+    "plugins": ["prettier"],
+    "extends": ["airbnb-base", "plugin:prettier/recommended"],
+    "rules": {
+        "prettier/prettier": "error",
+        "indent": ["error", 4],
+        "import/prefer-default-export": "off",
+        "no-param-reassign": "off",
+        "no-plusplus": "off",
+        "import/extensions": "always"
+    }
+}
