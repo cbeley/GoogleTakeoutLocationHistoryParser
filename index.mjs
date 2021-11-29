@@ -35,24 +35,34 @@ const program = new Command();
 program
     .option(
         '-e, --entries-per-file <value>',
-        'The max amount of entries allowed per each kml and or geojson file. If unset, all entries will be in a single file.',
+        `
+    The max amount of entries allowed per each kml and or geojson
+    file. If unset, all entries will be in a single file.
+`,
         parseArgInt
     )
     .option('-k, --generate-KML', 'Generate kml')
     .option(
         '-eg, --exclude-geo-JSON',
-        'If set, no geoJSON will be generated. By default, geoJSON is always generated otherwise.'
+        `
+    If set, no geoJSON will be generated. By default, geoJSON
+    is always generated otherwise.`
     )
     .option(
         '-p, --pretty-output',
-        'If set, output will be more human readable. Applies to both JSON and KML.'
+        `
+    If set, output will be more human readable.
+    Applies to both JSON and KML.
+    `
     )
     .option(
         '-sd, --start-date <ISODateString>',
         `
-    Include entries after (inclusive) this date. If unset, you'll get results that go back as early as possible. 
-    If you do not specify a timezone offset, your computer's local timezone will be used.
-    Partial ISO date strings are ok, but keep in mind if you leave out the time, the time will start at the very beginning of your date.
+    Include entries after (inclusive) this date. If unset, you'll get
+    results that go back as early as possible. If you do not specify a
+    timezone offset, your computer's local timezone will be used.
+    Partial ISO date strings are ok, but keep in mind if you leave
+    out the time, the time will start at the very beginning of your date.
 
     ex:
         2021-01-01
@@ -62,9 +72,11 @@ program
     .option(
         '-ed, --end-date <ISODateString>',
         `
-    Include entries before (inclusive) this date. If unset, you'll get results that go up to the present local time.
-    If you do not specify a timezone offset, your computer's local timezone will be used.
-    Partial ISO date strings are ok, but keep in mind if you leave out the time, the time will start at the very beginning of your date.
+    Include entries before (inclusive) this date. If unset, you'll get
+    results that go up to the present local time. If you do not specify
+    a timezone offset, your computer's local timezone will be used.
+    Partial ISO date strings are ok, but keep in mind if you leave out
+    the time, the time will start at the very beginning of your date.
 
     ex:
         2021-01-01
@@ -73,7 +85,9 @@ program
     )
     .option(
         '-s, --print-stats',
-        'If set, some stats about what was parsed will be printed to the console.'
+        `
+    If set, some stats about what was parsed will be printed to the console.
+`
     )
     .option(
         '-o, --output-name <name>',
@@ -100,13 +114,16 @@ program
     .option(
         '-a, --include-all-waypoints',
         `
-    By default, only the beginning and end of activity segments are included. However, Google 
-    sometimes records waypoints between the beginning and end of an activity segment. By default 
+    By default, only the beginning and end of activity segments
+    are included. However, Google sometimes records waypoints
+    between the beginning and end of an activity segment. By default
     these are not included, but can be added with this flag.
 
-    The waypoints will be merged into LineString corresponding to the activity segment, so it will 
-    not increase the object count. However, you may not want to turn this on if file size or processing
-    is a concern. It'll also reveal more of your specific route, so it may not be desirable from a privacy
+    The waypoints will be merged into LineString corresponding
+    to the activity segment, so it will not increase the object
+    count. However, you may not wantto turn this on if file size
+    or processing is a concern. It'll also reveal more of your
+    specific route, so it may not be desirable from a privacy
     stand-point as well.
 `
     )
