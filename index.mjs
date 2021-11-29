@@ -1,16 +1,27 @@
-import { Command } from 'commander';
+import { Command, InvalidArgumentError } from 'commander';
 
 import googleTakeoutToGeoJSON from './src/googleTakeoutToGeoJSON.mjs';
 import extractDateRangeFromGoogleTakeout from './src/extractDateRangeFromGoogleTakeout.mjs';
 import generateOutputFiles from './src/generateOutputFiles.mjs';
 import parseDateIntervalFromOptions from './src/parseDateIntervalFromOptions.mjs';
 
+const parseArgInt = (value) => {
+    const parsedValue = parseInt(value, 10);
+
+    if (Number.isNaN(parsedValue)) {
+        throw new InvalidArgumentError('Not a number.');
+    }
+
+    return parsedValue;
+};
+
 const program = new Command();
 
 program
     .option(
         '-e, --entries-per-file <value>',
-        'The max amount of entries allowed per each kml and or geojson file. If unset, all entries will be in a single file.'
+        'The max amount of entries allowed per each kml and or geojson file. If unset, all entries will be in a single file.',
+        parseArgInt
     )
     .option('-k, --generate-KML', 'Generate kml')
     .option(
