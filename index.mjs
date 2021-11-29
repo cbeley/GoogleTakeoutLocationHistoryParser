@@ -1,4 +1,7 @@
 import { Command, InvalidArgumentError } from 'commander';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 import googleTakeoutToGeoJSON from './src/googleTakeoutToGeoJSON.mjs';
 import extractDateRangeFromGoogleTakeout from './src/extractDateRangeFromGoogleTakeout.mjs';
@@ -13,6 +16,18 @@ const parseArgInt = (value) => {
     }
 
     return parsedValue;
+};
+
+const getVersion = () => {
+    const currentFileDirName = dirname(fileURLToPath(import.meta.url));
+
+    const { version } = JSON.parse(
+        readFileSync(join(currentFileDirName, './package.json'), {
+            encoding: 'utf-8',
+        })
+    );
+
+    return version;
 };
 
 const program = new Command();
@@ -96,6 +111,8 @@ program
 `
     )
     .argument('<googleTakeoutDirectory>')
+    .name('googleTakeoutLocationHistoryParser')
+    .version(getVersion())
     .action(async (googleTakeoutDirectory, options) => {
         if (options.excludeGeoJSON && !options.generateKML) {
             // eslint-ignore-next-line no-console

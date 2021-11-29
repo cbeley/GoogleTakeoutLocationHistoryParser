@@ -1,6 +1,9 @@
 {
     "plugins": ["prettier"],
     "extends": ["airbnb-base", "plugin:prettier/recommended"],
+    "parserOptions": {
+        "ecmaVersion": 2020
+    },
     "rules": {
         "prettier/prettier": "error",
         "indent": ["error", 4],
