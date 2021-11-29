@@ -1,3 +1,4 @@
+import { formatISO } from 'date-fns';
 const convertE7Coord = (coord) => coord / 1e7;
 
 const googleWaypointsToGeoJSONCoords = (
@@ -21,7 +22,7 @@ const googleWaypointsToGeoJSONCoords = (
     });
 };
 
-const createLineString = (coordinates) => ({
+const createLineString = (coordinates, properties) => ({
     type: 'Feature',
     geometry: {
         type: 'LineString',
@@ -29,10 +30,14 @@ const createLineString = (coordinates) => ({
     },
     properties: {
         name: 'line',
+        ...properties,
     },
 });
 
-export default (takeoutLocationData, includeAllWaypoints = false) => {
+export default (
+    takeoutLocationData,
+    { includeAllWaypoints = false, includeTimestamps = false }
+) => {
     const stats = {
         placeCount: 0,
         activitySegmentCount: 0,
@@ -51,6 +56,15 @@ export default (takeoutLocationData, includeAllWaypoints = false) => {
             );
         }
 
+        let timestamp;
+
+        if (includeTimestamps) {
+            const {
+                duration: { startTimestampMs },
+            } = placeVisit || activitySegment;
+            timestamp = formatISO(parseInt(startTimestampMs, 10));
+        }
+
         if (placeVisit) {
             const {
                 location: { latitudeE7, longitudeE7, name },
@@ -67,6 +81,7 @@ export default (takeoutLocationData, includeAllWaypoints = false) => {
                 },
                 properties: {
                     name,
+                    timestamp,
                 },
             });
 
@@ -83,20 +98,23 @@ export default (takeoutLocationData, includeAllWaypoints = false) => {
             }
 
             geoJSON.features.push(
-                createLineString([
+                createLineString(
                     [
-                        convertE7Coord(startLocation.longitudeE7),
-                        convertE7Coord(startLocation.latitudeE7),
+                        [
+                            convertE7Coord(startLocation.longitudeE7),
+                            convertE7Coord(startLocation.latitudeE7),
+                        ],
+                        ...googleWaypointsToGeoJSONCoords(
+                            activitySegment,
+                            includeAllWaypoints
+                        ),
+                        [
+                            convertE7Coord(endLocation.longitudeE7),
+                            convertE7Coord(endLocation.latitudeE7),
+                        ],
                     ],
-                    ...googleWaypointsToGeoJSONCoords(
-                        activitySegment,
-                        includeAllWaypoints
-                    ),
-                    [
-                        convertE7Coord(endLocation.longitudeE7),
-                        convertE7Coord(endLocation.latitudeE7),
-                    ],
-                ])
+                    { timestamp }
+                )
             );
 
             ++stats.activitySegmentCount;

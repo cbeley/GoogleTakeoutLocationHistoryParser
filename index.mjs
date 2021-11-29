@@ -127,6 +127,19 @@ program
     stand-point as well.
 `
     )
+    .option(
+        '-t, --include-timestamps',
+        `
+    Adds timestamps to each point and line in your output.
+    The time at which you start moving or arrive at a point will
+    be used.
+
+    By default, this is disabled.
+
+    If you need the ending time, you can add "duration" to 
+    "--metadata".
+`
+    )
     .argument('<googleTakeoutDirectory>')
     .name('googleTakeoutLocationHistoryParser')
     .version(getVersion())
@@ -154,7 +167,7 @@ program
 
         const { geoJSON, stats } = googleTakeoutToGeoJSON(
             mergedTakeoutData,
-            options.includeAllWaypoints
+            options
         );
 
         await generateOutputFiles(geoJSON, options);
