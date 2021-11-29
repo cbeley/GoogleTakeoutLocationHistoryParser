@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import googleTakeoutToGeoJSON from './src/googleTakeoutToGeoJSON.mjs';
 import extractDateRangeFromGoogleTakeout from './src/extractDateRangeFromGoogleTakeout.mjs';
 import generateOutputFiles from './src/generateOutputFiles.mjs';
+import parseDateIntervalFromOptions from './src/parseDateIntervalFromOptions.mjs';
 
 const program = new Command();
 
@@ -19,6 +20,30 @@ program
     .option(
         '-p, --pretty-output',
         'If set, output will be more human readable. Applies to both JSON and KML.'
+    )
+    .option(
+        '-sd, --start-date <ISODateString>',
+        `
+    Include entries after (inclusive) this date. If unset, you'll get results that go back as early as possible. 
+    If you do not specify a timezone offset, your computer's local timezone will be used.
+    Partial ISO date strings are ok, but keep in mind if you leave out the time, the time will start at the very beginning of your date.
+
+    ex:
+        2021-01-01
+        2021-01-01T14:30
+`
+    )
+    .option(
+        '-ed, --end-date <ISODateString>',
+        `
+    Include entries before (inclusive) this date. If unset, you'll get results that go up to the present local time.
+    If you do not specify a timezone offset, your computer's local timezone will be used.
+    Partial ISO date strings are ok, but keep in mind if you leave out the time, the time will start at the very beginning of your date.
+
+    ex:
+        2021-01-01
+        2021-01-01T14:30
+`
     )
     .option(
         '-s, --print-stats',
@@ -46,8 +71,8 @@ program
 `,
         'out'
     )
-    .argument('<googleTakeoutLocationJSONFiles...>')
-    .action(async (googleTakeoutLocationJSONFiles, options) => {
+    .argument('<googleTakeoutDirectory>')
+    .action(async (googleTakeoutDirectory, options) => {
         if (options.excludeGeoJSON && !options.generateKML) {
             // eslint-ignore-next-line no-console
             console.log(
@@ -55,8 +80,18 @@ program
             );
         }
 
+        let dateInterval;
+
+        try {
+            dateInterval = parseDateIntervalFromOptions(options);
+        } catch (ex) {
+            console.error(`Failed to parse your date interval: ${ex.message}`);
+            process.exit(1);
+        }
+
         const mergedTakeoutData = await extractDateRangeFromGoogleTakeout(
-            googleTakeoutLocationJSONFiles
+            googleTakeoutDirectory,
+            dateInterval
         );
 
         const { geoJSON, stats } = googleTakeoutToGeoJSON(mergedTakeoutData);
