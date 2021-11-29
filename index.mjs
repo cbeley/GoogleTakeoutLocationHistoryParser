@@ -82,6 +82,19 @@ program
 `,
         'out'
     )
+    .option(
+        '-a, --include-all-waypoints',
+        `
+    By default, only the beginning and end of activity segments are included. However, Google 
+    sometimes records waypoints between the beginning and end of an activity segment. By default 
+    these are not included, but can be added with this flag.
+
+    The waypoints will be merged into LineString corresponding to the activity segment, so it will 
+    not increase the object count. However, you may not want to turn this on if file size or processing
+    is a concern. It'll also reveal more of your specific route, so it may not be desirable from a privacy
+    stand-point as well.
+`
+    )
     .argument('<googleTakeoutDirectory>')
     .action(async (googleTakeoutDirectory, options) => {
         if (options.excludeGeoJSON && !options.generateKML) {
@@ -105,7 +118,10 @@ program
             dateInterval
         );
 
-        const { geoJSON, stats } = googleTakeoutToGeoJSON(mergedTakeoutData);
+        const { geoJSON, stats } = googleTakeoutToGeoJSON(
+            mergedTakeoutData,
+            options.includeAllWaypoints
+        );
 
         await generateOutputFiles(geoJSON, options);
 
