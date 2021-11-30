@@ -228,3 +228,7 @@ Options:
   -V, --version                      output the version number
   -h, --help                         display help for command
 ```
+
+### A small Real-Life Example
+
+While I've wanted something like this in the past, I finally put it together because I wanted a map visualizing everywhere I'd been on my long road-trip. If you're curious, the map is on one of my blog posts: [19,367 Miles and 183 Days Later](https://chrisbeley.com/travel/19365-miles-and-183-days-later...).
