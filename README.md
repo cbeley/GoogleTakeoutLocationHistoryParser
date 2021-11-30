@@ -17,7 +17,15 @@
 
 ## Installation
 
-TODO -- will be via yarn/npm.
+The `googleTakeoutLocationHistoryParser` executable can be installed via yarn or npm:
+
+```bash
+yarn global add google-takeout-location-history-parser
+```
+
+```bash
+npm install -g google-takeout-location-history-parser
+```
 
 ## The Problem
 
