@@ -9,10 +9,10 @@
 -   Automatically split output files by a given entry limit (for importing into things like [Google My Maps](https://www.google.com/maps/d/))
 -   Control what level of detail you want between stops.
 -   TODO: Include or exclude dates
--   TODO: Cherry pick extra data to include (for geoJSON output only)
+-   TODO: Cherry pick extra metadata to include (for geoJSON output only)
     -   placeId (Google's place id)
     -   activityType
-    -   timeSpentAtLocation
+    -   durationInMS
     -   address (ex: "1058 Folsom Street, San Francisco, California 94103, United States")
 
 ## Installation
@@ -78,6 +78,43 @@ googleTakeoutLocationHistoryParser -k -eg -e 2000 -o my-trip -sd 2021-04-30 -ed 
 The above will not output a geoJSON file (`-eg`), will output a KML file needed for [Google My Maps](https://www.google.com/maps/d/) (`-k`), and ensure that each file will only contain at most 2000 entries (`-e 2000`). The output will look something like `my-trip-1.kml`, `my-trip-2.kml`, etc.
 
 Numbers in filenames will be left-padded as needed.
+
+### Include additional metadata
+
+You can include additional metadata with the `-m` flag. This data will be available under "ExtendedData" in KML files and under "properties" in geoJSON files. Available options are:
+
+-   **placeId:** The Google place ID.
+-   **activityType:** The type of activity associated with a line segment.
+-   **durationInMS:** How long you were at a particular location/point
+    or how long you spent traversing a line
+    segment/doing an activity.
+-   **address:** A textual representation of the full address of a location/point.
+
+```bash
+googleTakeoutLocationHistoryParser -m placeId activityType address path/to/googleTakeoutDirectory
+```
+
+#### Possible values for `activityType`.
+
+As far as I know, `activityType` will always be one of:
+
+-   WALKING
+-   STILL
+-   IN_PASSENGER_VEHICLE
+-   CYCLING
+-   IN_TRAIN
+-   RUNNING
+-   MOTORCYCLING
+-   IN_BUS
+-   IN_TRAM
+-   IN_FERRY
+-   IN_SUBWAY
+-   SAILING
+-   SKIING
+-   FLYING
+-   IN_VEHICLE
+
+Looking at my own history, I'm not quite sure I understand the difference between `IN_PASSENGER_VEHICLE` and `IN_VEHICLE`. Even when I was the one driving, I seem to get `IN_PASSENGER_VEHICLE`.
 
 ## Command-Line Options
 
@@ -153,6 +190,33 @@ Options:
       specific route, so it may not be desirable from a privacy
       stand-point as well.
 
+  -t, --include-timestamps
+      Adds timestamps to each point and line in your output.
+      The time at which you start moving or arrive at a point will
+      be used.
+
+      By default, this is disabled.
+
+      If you need the ending time, you can add "duration" to
+      "--metadata".
+
+  -m, --metadata <metadata...>
+      Allows you to include certain extra metadata that Google
+      generates. In KML files, these values will be available under
+      "ExtendedData" and in geoJSON files under "properties".
+
+      Available metadata:
+       * placeId: The Google place ID.
+       * activityType: The type of activity associated with a line segment.
+       * durationInMS: How long you were at a particular location/point
+                       or how long you spent traversing a line
+                       segment/doing an activity.
+       * address: A textual representation of the full address of a location/point.
+
+      The value of activityType will be: WALKING, STILL, IN_PASSENGER_VEHICLE,
+      CYCLING, IN_TRAIN, RUNNING, MOTORCYCLING, IN_BUS, IN_TRAM, IN_FERRY, IN_SUBWAY,
+      SAILING, SKIING, FLYING, or IN_VEHICLE.
+   (default: [])
   -V, --version                      output the version number
   -h, --help                         display help for command
 ```

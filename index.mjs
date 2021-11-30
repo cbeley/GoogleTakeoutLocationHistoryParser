@@ -18,6 +18,28 @@ const parseArgInt = (value) => {
     return parsedValue;
 };
 
+const VALID_METADATA = new Set([
+    'placeId',
+    'activityType',
+    'durationInMS',
+    'address',
+]);
+
+const validateMetadata = (metadata) => {
+    metadata.forEach((key) => {
+        if (!VALID_METADATA.has(key)) {
+            console.error(
+                `${key} is not a valid metadata option. Must be one of ${[
+                    ...VALID_METADATA.values(),
+                ].join(', ')}.`
+            );
+            process.exit(1);
+        }
+    });
+
+    return metadata;
+};
+
 const getVersion = () => {
     const currentFileDirName = dirname(fileURLToPath(import.meta.url));
 
@@ -140,10 +162,33 @@ program
     "--metadata".
 `
     )
+    .option(
+        '-m, --metadata <metadata...>',
+        `
+    Allows you to include certain extra metadata that Google
+    generates. In KML files, these values will be available under
+    "ExtendedData" and in geoJSON files under "properties". 
+
+    Available metadata:
+     * placeId: The Google place ID. 
+     * activityType: The type of activity associated with a line segment.
+     * durationInMS: How long you were at a particular location/point
+                     or how long you spent traversing a line
+                     segment/doing an activity.
+     * address: A textual representation of the full address of a location/point.
+
+    The value of activityType will be: WALKING, STILL, IN_PASSENGER_VEHICLE, 
+    CYCLING, IN_TRAIN, RUNNING, MOTORCYCLING, IN_BUS, IN_TRAM, IN_FERRY, IN_SUBWAY,
+    SAILING, SKIING, FLYING, or IN_VEHICLE.
+`,
+        []
+    )
     .argument('<googleTakeoutDirectory>')
     .name('googleTakeoutLocationHistoryParser')
     .version(getVersion())
     .action(async (googleTakeoutDirectory, options) => {
+        validateMetadata(options.metadata);
+
         if (options.excludeGeoJSON && !options.generateKML) {
             // eslint-ignore-next-line no-console
             console.log(

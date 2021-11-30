@@ -34,9 +34,42 @@ const createLineString = (coordinates, properties) => ({
     },
 });
 
+const metdataHandlers = {
+    placeId({ location }) {
+        if (location) {
+            return location.placeId;
+        }
+
+        return undefined;
+    },
+    activityType({ activityType }) {
+        return activityType;
+    },
+    address({ location }) {
+        if (location) {
+            return location.address;
+        }
+
+        return undefined;
+    },
+    durationInMS({ duration: { startTimestampMs, endTimestampMs } }) {
+        return parseInt(endTimestampMs, 10) - parseInt(startTimestampMs, 10);
+    },
+};
+
+const extractMetadata = (locationObj, desiredMetadata) => {
+    const metadata = {};
+
+    desiredMetadata.forEach((key) => {
+        metadata[key] = metdataHandlers[key](locationObj);
+    });
+
+    return metadata;
+};
+
 export default (
     takeoutLocationData,
-    { includeAllWaypoints = false, includeTimestamps = false }
+    { includeAllWaypoints = false, includeTimestamps = false, metadata = [] }
 ) => {
     const stats = {
         placeCount: 0,
@@ -56,13 +89,17 @@ export default (
             );
         }
 
-        let timestamp;
+        const properties = extractMetadata(
+            placeVisit || activitySegment,
+            metadata
+        );
 
         if (includeTimestamps) {
             const {
                 duration: { startTimestampMs },
             } = placeVisit || activitySegment;
-            timestamp = formatISO(parseInt(startTimestampMs, 10));
+
+            properties.timestamp = formatISO(parseInt(startTimestampMs, 10));
         }
 
         if (placeVisit) {
@@ -81,7 +118,7 @@ export default (
                 },
                 properties: {
                     name,
-                    timestamp,
+                    ...properties,
                 },
             });
 
@@ -113,7 +150,7 @@ export default (
                             convertE7Coord(endLocation.latitudeE7),
                         ],
                     ],
-                    { timestamp }
+                    properties
                 )
             );
 
