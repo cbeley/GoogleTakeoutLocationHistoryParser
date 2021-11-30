@@ -8,8 +8,8 @@
     -   In other words, if you are at Fancy Restaurant, the point will have its name value set to "Fancy Restaurant".
 -   Automatically split output files by a given entry limit (for importing into things like [Google My Maps](https://www.google.com/maps/d/))
 -   Control what level of detail you want between stops.
--   TODO: Include or exclude dates
--   TODO: Cherry pick extra metadata to include (for geoJSON output only)
+-   Include or exclude dates
+-   Cherry pick extra metadata to include (for geoJSON output only)
     -   placeId (Google's place id)
     -   activityType
     -   durationInMS
