@@ -55,13 +55,13 @@ const monthsInDateRangeForYear = ({ start: startDate, end: endDate }, year) => {
     let startMonth;
     let endMonth;
 
-    if (startDate.getUTCFullYear < year) {
+    if (startDate.getUTCFullYear() < year) {
         startMonth = 0;
     } else {
         startMonth = startDate.getUTCMonth();
     }
 
-    if (endDate.getUTCFullYear > year) {
+    if (endDate.getUTCFullYear() > year) {
         endMonth = 11;
     } else {
         endMonth = endDate.getUTCMonth();
