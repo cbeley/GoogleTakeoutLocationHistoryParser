@@ -133,14 +133,16 @@ export default async (googleTakeoutDirectory, dateInterval) => {
                 return false;
             }
 
+	    // Google Takeout previously used {start,end}TimestampMs for these keys, but now uses {start,end}Timestamp, so we
+	    // parse both.
             const {
-                duration: { startTimestampMs, endTimestampMs },
+                duration: { startTimestamp, startTimestampMs, endTimestamp, endTimestampMs },
             } = placeVisit || activitySegment;
 
             // Interesting decision by google to represent the timestamp as a string. I'm sure this
             // has to do with concerns of the int overflowing during parsing in some languages/environments.
-            const visitStart = new Date(parseInt(startTimestampMs, 10));
-            const visitEnd = new Date(parseInt(endTimestampMs, 10));
+            const visitStart = new Date(parseInt(startTimestamp || startTimestampMs, 10));
+            const visitEnd = new Date(parseInt(endTimestamp || endTimestampMs, 10));
 
             return (
                 isWithinInterval(visitStart, dateInterval) &&
