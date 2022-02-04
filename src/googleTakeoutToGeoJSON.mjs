@@ -52,8 +52,9 @@ const metdataHandlers = {
 
         return undefined;
     },
-    durationInMS({ duration: { startTimestampMs, endTimestampMs } }) {
-        return parseInt(endTimestampMs, 10) - parseInt(startTimestampMs, 10);
+    durationInMS({ duration: { startTimestamp, startTimestampMs, endTimestamp, endTimestampMs } }) {
+        return parseInt(endTimestampMs || Date.parse(endTimestamp), 10) -
+	    parseInt(startTimestampMs || Date.parse(startTimestamp), 10);
     },
 };
 
@@ -96,10 +97,10 @@ export default (
 
         if (includeTimestamps) {
             const {
-                duration: { startTimestampMs },
+                duration: { startTimestamp, startTimestampMs },
             } = placeVisit || activitySegment;
 
-            properties.timestamp = formatISO(parseInt(startTimestampMs, 10));
+            properties.timestamp = formatISO(parseInt(startTimestampMs || Date.parse(startTimestamp), 10));
         }
 
         if (placeVisit) {

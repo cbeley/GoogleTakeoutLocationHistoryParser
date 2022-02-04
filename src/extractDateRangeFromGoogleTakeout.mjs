@@ -141,8 +141,8 @@ export default async (googleTakeoutDirectory, dateInterval) => {
 
             // Interesting decision by google to represent the timestamp as a string. I'm sure this
             // has to do with concerns of the int overflowing during parsing in some languages/environments.
-            const visitStart = new Date(parseInt(startTimestamp || startTimestampMs, 10));
-            const visitEnd = new Date(parseInt(endTimestamp || endTimestampMs, 10));
+            const visitStart = new Date(parseInt(startTimestampMs || Date.parse(startTimestamp), 10));
+            const visitEnd = new Date(parseInt(endTimestampMs || Date.parse(endTimestamp), 10));
 
             return (
                 isWithinInterval(visitStart, dateInterval) &&
