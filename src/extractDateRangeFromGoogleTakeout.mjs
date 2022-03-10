@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
-import { isWithinInterval } from 'date-fns';
+import { isWithinInterval, parseISO } from 'date-fns';
 
 const getYearFoldersToParse = async (
     { start: startDate, end: endDate },
@@ -133,14 +133,16 @@ export default async (googleTakeoutDirectory, dateInterval) => {
                 return false;
             }
 
+            // Google Takeout previously used {start,end}TimestampMs for these keys, but now uses {start,end}Timestamp, so we
+            // parse both.
             const {
-                duration: { startTimestampMs, endTimestampMs },
+                duration: { startTimestamp, startTimestampMs, endTimestamp, endTimestampMs },
             } = placeVisit || activitySegment;
 
             // Interesting decision by google to represent the timestamp as a string. I'm sure this
             // has to do with concerns of the int overflowing during parsing in some languages/environments.
-            const visitStart = new Date(parseInt(startTimestampMs, 10));
-            const visitEnd = new Date(parseInt(endTimestampMs, 10));
+            const visitStart = startTimestampMs ? new Date(parseInt(startTimestampMs, 10)) : parseISO(startTimestamp);
+            const visitEnd = endTimestampMs ? new Date(parseInt(endTimestampMs, 10)) : parseISO(endTimestamp);
 
             return (
                 isWithinInterval(visitStart, dateInterval) &&
