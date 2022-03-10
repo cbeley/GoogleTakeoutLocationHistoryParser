@@ -53,8 +53,9 @@ const metdataHandlers = {
         return undefined;
     },
     durationInMS({ duration: { startTimestamp, startTimestampMs, endTimestamp, endTimestampMs } }) {
-        return parseInt(endTimestampMs || parseISO(endTimestamp), 10) -
-	    parseInt(startTimestampMs || parseISO(startTimestamp), 10);
+        return startTimestampMs ?
+            (parseInt(endTimestampMs, 10) - parseInt(startTimestampMs, 10)) :
+            (parseISO(endTimestamp).getTime() - parseISO(startTimestamp).getTime());
     },
 };
 
@@ -100,7 +101,8 @@ export default (
                 duration: { startTimestamp, startTimestampMs },
             } = placeVisit || activitySegment;
 
-            properties.timestamp = formatISO(parseInt(startTimestampMs || parseISO(startTimestamp), 10));
+            properties.timestamp = formatISO(
+                startTimestampMs ? parseInt(startTimestampMs, 10) : parseISO(startTimestamp).getTime());
         }
 
         if (placeVisit) {
