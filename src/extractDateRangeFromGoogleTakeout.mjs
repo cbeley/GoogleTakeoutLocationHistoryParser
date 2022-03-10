@@ -1,6 +1,6 @@
 import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
-import { isWithinInterval } from 'date-fns';
+import { isWithinInterval, parseISO } from 'date-fns';
 
 const getYearFoldersToParse = async (
     { start: startDate, end: endDate },
@@ -141,8 +141,8 @@ export default async (googleTakeoutDirectory, dateInterval) => {
 
             // Interesting decision by google to represent the timestamp as a string. I'm sure this
             // has to do with concerns of the int overflowing during parsing in some languages/environments.
-            const visitStart = new Date(parseInt(startTimestampMs || Date.parse(startTimestamp), 10));
-            const visitEnd = new Date(parseInt(endTimestampMs || Date.parse(endTimestamp), 10));
+            const visitStart = new Date(parseInt(startTimestampMs || parseISO(startTimestamp), 10));
+            const visitEnd = new Date(parseInt(endTimestampMs || parseISO(endTimestamp), 10));
 
             return (
                 isWithinInterval(visitStart, dateInterval) &&

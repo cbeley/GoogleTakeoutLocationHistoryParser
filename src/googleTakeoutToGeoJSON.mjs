@@ -1,4 +1,4 @@
-import { formatISO } from 'date-fns';
+import { formatISO, parseISO } from 'date-fns';
 const convertE7Coord = (coord) => coord / 1e7;
 
 const googleWaypointsToGeoJSONCoords = (
@@ -53,8 +53,8 @@ const metdataHandlers = {
         return undefined;
     },
     durationInMS({ duration: { startTimestamp, startTimestampMs, endTimestamp, endTimestampMs } }) {
-        return parseInt(endTimestampMs || Date.parse(endTimestamp), 10) -
-	    parseInt(startTimestampMs || Date.parse(startTimestamp), 10);
+        return parseInt(endTimestampMs || parseISO(endTimestamp), 10) -
+	    parseInt(startTimestampMs || parseISO(startTimestamp), 10);
     },
 };
 
@@ -100,7 +100,7 @@ export default (
                 duration: { startTimestamp, startTimestampMs },
             } = placeVisit || activitySegment;
 
-            properties.timestamp = formatISO(parseInt(startTimestampMs || Date.parse(startTimestamp), 10));
+            properties.timestamp = formatISO(parseInt(startTimestampMs || parseISO(startTimestamp), 10));
         }
 
         if (placeVisit) {
