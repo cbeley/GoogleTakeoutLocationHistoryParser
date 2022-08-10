@@ -1,6 +1,6 @@
 {
     "name": "google-takeout-location-history-parser",
-    "version": "0.0.3",
+    "version": "0.1.0",
     "main": "index.mjs",
     "license": "MIT",
     "author": "Chris Beley <chris.beley@gmail.com>",
