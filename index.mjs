@@ -180,6 +180,9 @@ program
     The value of activityType will be: WALKING, STILL, IN_PASSENGER_VEHICLE, 
     CYCLING, IN_TRAIN, RUNNING, MOTORCYCLING, IN_BUS, IN_TRAM, IN_FERRY, IN_SUBWAY,
     SAILING, SKIING, FLYING, or IN_VEHICLE.
+
+    Use '--' to signify the end of your list.  
+    ex: "-m placeId address --"
 `,
         []
     )
